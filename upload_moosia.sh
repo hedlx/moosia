@@ -26,6 +26,9 @@ ffmpeg -y -loglevel error -i "$tmp/full.mp4" \
     -vf "thumbnail,scale=w=320:h=320:force_original_aspect_ratio=decrease" \
     -frames:v 1 "$tmp/thumb.jpg"
 
+# Make message
+msg=$([[ $1 =~ .*-timelapse.mpg ]] && echo '%23timelapse' || echo '')
+
 # Read some metadata
 IFS=, read width height duration < <(
     ffprobe -v error -select_streams v:0 \
@@ -34,6 +37,6 @@ IFS=, read width height duration < <(
 
 # Upload
 tg_curl \
-    "sendVideo?chat_id=$tg_chat_id&width=$width&height=$height&duration=$duration&supports_streaming=True" \
+    "sendVideo?chat_id=$tg_chat_id&caption=$msg&width=$width&height=$height&duration=$duration&supports_streaming=True" \
     -F "video=@$tmp/full.mp4;filename=Moosia_$vid_name.mp4" \
     -F "thumb=@$tmp/thumb.jpg"
